@@ -17,7 +17,6 @@ describe('check database imap types', () => {
         db = await DB.open(storage)
         const t = await db.tables.tictactoe
             .key('stateID', ['game', 'turn', 'moves'])
-            // .forangeKey('parentID', db.tables.tictactoe, 'parent')
             .type('childs', ISet)
             .type('game', IMap)
             .index('state')
