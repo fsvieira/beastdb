@@ -15,9 +15,6 @@ describe('remove elements from imap', () => {
 
     beforeEach(async function () {
         db = await DB.open(storage)
-        await db.tables.imaps
-            .type('imap', IMap)
-            .save();
     });
     
     afterEach(async function () {

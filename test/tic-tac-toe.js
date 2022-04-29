@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { statistics } = require('fast-check');
 const {DB, ISet, IMap} = require('../lib/db');
 
-describe('check database imap types', () => {
+describe('Tic-tac-toe cases', () => {
     // string text always contains itself
 
     let db;
@@ -17,8 +17,6 @@ describe('check database imap types', () => {
         db = await DB.open(storage)
         const t = await db.tables.tictactoe
             .key('stateID', ['game', 'turn', 'moves'])
-            .type('childs', ISet)
-            .type('game', IMap)
             .index('state')
             .index('moves')
             .save();
