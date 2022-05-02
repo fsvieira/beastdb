@@ -99,6 +99,7 @@ async function tictactoe () {
         .key('stateID', ['game', 'turn', 'moves'])
         .index('state')
         .index('win')
+        .index('game')
         .save();
 
     const start = await t.insert({
@@ -116,6 +117,11 @@ async function tictactoe () {
     let doExpand;
 
     console.log('Start State', await start.data.state);
+
+    /*
+    for await (let [key, value] of db.query({gt: ''})) {
+        console.log(key, value);
+    }*/
 
     let totalNodes = 0;
     do {
@@ -155,6 +161,21 @@ async function tictactoe () {
     console.log("List Last Win Node Parents");
     for (let s of parents) {
         await print(s);
+    }
+
+
+    // find game state
+    {
+        const gameState = await db.iMap().fromJSON([
+            ['X', '#', '#'],
+            ['#', 'O', '#'],
+            ['#', '#', 'X']
+        ]);
+
+        for await (let state of t.findByIndex({game: gameState})) {
+            const turn = await state.data.turn;
+            console.log("Turn => ", turn);
+        }
     }
 }
 
