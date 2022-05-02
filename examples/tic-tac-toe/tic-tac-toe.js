@@ -101,7 +101,7 @@ async function tictactoe () {
         .index('win')
         .save();
 
-    await t.insert({
+    const start = await t.insert({
         moves: 0,
         state: 'expand',
         turn: '',
@@ -114,6 +114,8 @@ async function tictactoe () {
     }, null);
 
     let doExpand;
+
+    console.log('Start State', await start.data.state);
 
     let totalNodes = 0;
     do {

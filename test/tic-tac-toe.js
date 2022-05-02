@@ -189,7 +189,7 @@ describe('Tic-tac-toe cases', () => {
 
             const childs = (await (await start.data.childs).toArray()).map(node => node.id);
             
-            expect(childs).to.deep.equal(["0j42vSMlXJaNSltCe5QRnW/tfwEmkZYRZuIuvFsF4Os="]);
+            expect(childs).to.deep.equal(["KRyCYmdM5hf2KKV1BuD/hBdxp+nbrUPgJX1L7LKw5MU="]);
         });
     });
 });
