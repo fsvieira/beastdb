@@ -55,12 +55,15 @@ async function expand (t, state) {
             if (cell === '#') {
                 const newGame = (await game.set(y, await line.set(x, turn)));
 
-                const win = await isWin(turn, newGame);
+                const didWin = await isWin(turn, newGame);
 
+                const moves = (await state.data.moves) + 1;
+                let win = didWin?turn:(moves === 9?'T':'');
+                
                 childs.add(
                     await t.insert({
-                        moves: (await state.data.moves) + 1,
-                        state: win ? 'done' : 'expand',
+                        moves,
+                        state: win === '' ? 'expand' : 'stats',
                         turn,
                         win,
                         game: newGame,
@@ -80,6 +83,7 @@ async function print (state) {
     const turn = await state.data.turn;
     const moves = await state.data.moves;
     const game = await state.data.game;
+    const stats = await state.data.stats;
 
     for await (let [y, line] of game) {
         for await (let [x, cell] of line) {
@@ -89,7 +93,45 @@ async function print (state) {
         board+= '\n';
     }
 
-    console.log(`=====\n turn: ${turn}, moves: ${moves}\n -- \n`, board);
+    console.log(`Turn: ${turn},\n Moves: ${moves},\nStats: ${JSON.stringify(stats)},\n${board}\n`);
+}
+
+async function calcStatsTurn (t, turn) {
+    console.log(`-- Gen ${turn} Stats`);
+
+    for await (let state of t.findByIndex({win: turn, state: 'stats'})) {
+        await state.update({stats: {X: 0, T: 0, O: 0, [turn]: 1}, state: 'done'});
+
+        const stack = [...(await state.data.parents)];
+        do {
+            const parent = stack.pop();
+            const stats = (await parent.data.stats) || {X:0, T:0, O: 0};
+
+            await parent.update({
+                stats: {...stats, [turn]: (stats[turn] || 0) + 1},
+                state: 'done'
+            });
+
+            const parents = await parent.data.parents;
+            if (parents) {
+                stack.push(...parents);
+            }
+
+            // console.log("Stack", stack.length);
+        }
+        while (stack.length);
+    }
+
+    console.log(`-- End ${turn} Stats`);
+}
+
+
+async function calcStats (t) {
+
+    // get X win nodes,
+    await calcStatsTurn(t, 'X');
+    await calcStatsTurn(t, 'T');
+    await calcStatsTurn(t, 'O');
 }
 
 async function tictactoe () {
@@ -98,11 +140,11 @@ async function tictactoe () {
     const t = await db.tables.tictactoe
         .key('stateID', ['game', 'turn', 'moves'])
         .index('state')
-        .index('win')
+        .index('win', 'state')
         .index('game')
         .save();
 
-    const start = await t.insert({
+    await t.insert({
         moves: 0,
         state: 'expand',
         turn: '',
@@ -116,14 +158,7 @@ async function tictactoe () {
 
     let doExpand;
 
-    console.log('Start State', await start.data.state);
-
-    /*
-    for await (let [key, value] of db.query({gt: ''})) {
-        console.log(key, value);
-    }*/
-
-    let totalNodes = 0;
+    // expand all states
     do {
         doExpand = false;
         let lastMoves = -1;
@@ -134,47 +169,25 @@ async function tictactoe () {
                 console.log("Expand: " + moves);
             }
 
-            totalNodes++;
             await expand(t, state);
             doExpand = true;
         }
     } while(doExpand)
 
-    const wins = {}
-    let winNode;
-    for await (let state of t.findByIndex({win: true})) {
-        const turn = await state.data.turn;
-        wins[turn] = (wins[turn] || 0) + 1; 
-        await print(state);
-        winNode = state;
-    }
-
-
-    console.log("Generated ", totalNodes, " states!");
-    console.log(JSON.stringify(wins));
-
-    const parents = await winNode.data.parents;
-
-    console.log("-- Last Win Node --");
-    await print(winNode);
-
-    console.log("List Last Win Node Parents");
-    for (let s of parents) {
-        await print(s);
-    }
-
+    await calcStats(t);
 
     // find game state
-    {
-        const gameState = await db.iMap().fromJSON([
-            ['X', '#', '#'],
-            ['#', 'O', '#'],
-            ['#', '#', 'X']
-        ]);
+    const gameState = await db.iMap().fromJSON([
+        ['X', '#', 'O'],
+        ['#', 'O', 'O'],
+        ['X', '#', 'X']
+    ]);
 
-        for await (let state of t.findByIndex({game: gameState})) {
-            const turn = await state.data.turn;
-            console.log("Turn => ", turn);
+    for await (let state of t.findByIndex({game: gameState})) {
+        const childs = await state.data.childs;
+
+        for (let child of childs) {
+            print(child);
         }
     }
 }
