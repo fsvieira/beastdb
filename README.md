@@ -174,15 +174,39 @@ Objects and Arrays can be nested and can have any type of value described on thi
 
 ### IMap and ISet
 
-IMap and ISet are immutable so every write operation will return a new IMap or ISet. 
+IMap and ISet are immutable so every write operation will return a new IMap or ISet.
 
-#### IMap
 
-TODO
+# IMap
 
-#### ISet
+Since IMap is created on every write operation we can start with an empty imap and then 
+add new labels like this:
 
-TODO
+```javascript
+    const empty = await db.iMap();
+    let s1 = await empty.set('label1', value);
+    s1 = await s1.set('label2', value);    
+```
+
+After completing our imap we can save it to a record, this will only save the last IMap 
+and discard all intermidiate states.
+
+```javascript
+    await record.insert({
+       mymap: s1    
+    });
+```
+
+## set
+## remove
+## iterators
+
+# ISet
+
+## add
+## remove
+## iterators
+
 
 # Example
 
