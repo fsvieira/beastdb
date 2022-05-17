@@ -45,8 +45,8 @@ describe('Tic-tac-toe cases', () => {
             const t = await db.tables.tictactoe;
             const [start] = await t.findByIndexArray({moves: 0});
             const game = await start.data.game;
-            expect((await game.get('0')).id).to.deep.equal((await game.get('1')).id);
-            expect((await (await game.get('0')).get('0'))).to.deep.equal('#');
+            expect(await game.chain.get('0').id).to.deep.equal(await game.chain.get('1').id);
+            expect(await game.chain.get('0').get('0')).to.deep.equal('#');
         });
 
         it('should generate same primary key for same states.', async () => {
@@ -185,9 +185,9 @@ describe('Tic-tac-toe cases', () => {
                 ])
             });
 
-            start.update({childs: await (await start.data.childs).add(s)});
+            start.update({childs: await start.data.childs.add(s)});
 
-            const childs = (await (await start.data.childs).toArray()).map(node => node.id);
+            const childs = (await start.data.childs.toArray()).map(node => node.id);
             
             expect(childs).to.deep.equal(["KRyCYmdM5hf2KKV1BuD/hBdxp+nbrUPgJX1L7LKw5MU="]);
         });

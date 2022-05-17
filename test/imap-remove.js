@@ -31,11 +31,11 @@ describe('remove elements from imap', () => {
                     imap: await db.iMap().set('label', v)
                 });
 
-                expect((await s.data.imap).size).to.be.equal(1);
+                expect(await s.data.imap.size).to.be.equal(1);
 
-                await s.update({ imap: await (await s.data.imap).remove('label') });
-                expect(await (await s.data.imap).get('label')).to.be.undefined;
-                expect((await s.data.imap).size).to.be.equal(0);
+                await s.update({ imap: await s.data.imap.remove('label') });
+                expect(await s.data.imap.get('label')).to.be.undefined;
+                expect(await s.data.imap.size).to.be.equal(0);
             }
         ));
     });
@@ -51,13 +51,13 @@ describe('remove elements from imap', () => {
                     })
                 });
 
-                expect((await s.data.imap).size).to.be.equal(2);
+                expect(await s.data.imap.size).to.be.equal(2);
 
-                await s.update({ imap: await (await s.data.imap).remove('label') });
-                expect(await (await s.data.imap).get('label')).to.be.undefined;
-                expect(await (await s.data.imap).get('label2')).to.deep.equal(v2);
+                await s.update({ imap: await s.data.imap.remove('label') });
+                expect(await s.data.imap.get('label')).to.be.undefined;
+                expect(await s.data.imap.get('label2')).to.deep.equal(v2);
 
-                expect((await s.data.imap).size).to.be.equal(1);
+                expect(await s.data.imap.size).to.be.equal(1);
             }
         ));
     });
@@ -72,9 +72,9 @@ describe('remove elements from imap', () => {
 
                 expect((await s.data.imap).size).to.be.equal(1);
 
-                await s.update({ imap: await (await s.data.imap).remove(l) });
-                expect(await (await s.data.imap).get(l)).to.be.undefined;
-                expect((await s.data.imap).size).to.be.equal(0);
+                await s.update({ imap: await s.data.imap.remove(l) });
+                expect(await s.data.imap.get(l)).to.be.undefined;
+                expect(await s.data.imap.size).to.be.equal(0);
             }
         ));
     });
@@ -93,10 +93,10 @@ describe('remove elements from imap', () => {
 
                 expect((await s.data.imap).size).to.be.equal(2);
 
-                await s.update({ imap: await (await s.data.imap).remove(l1) });
-                expect(await (await s.data.imap).get(l1)).to.be.undefined;
-                expect(await (await s.data.imap).get(l2)).to.deep.equal(v2);
-                expect((await s.data.imap).size).to.be.equal(1);
+                await s.update({ imap: await s.data.imap.remove(l1) });
+                expect(await s.data.imap.get(l1)).to.be.undefined;
+                expect(await s.data.imap.get(l2)).to.deep.equal(v2);
+                expect(await s.data.imap.size).to.be.equal(1);
             }
         ));
     });

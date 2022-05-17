@@ -32,8 +32,8 @@ describe('check database imap types', () => {
                     imap: await db.iMap().set('label', v)
                 });
 
-                expect(await (await s.data.imap).get('label')).to.deep.equal(v);
-                expect(await (await s.data.imap).toArray()).to.deep.equal([['label', v]]);
+                expect(await s.data.imap.get('label')).to.deep.equal(v);
+                expect(await s.data.imap.toArray()).to.deep.equal([['label', v]]);
             }
         ));
     });
@@ -46,7 +46,7 @@ describe('check database imap types', () => {
                     imap: await db.iMap().set(l, v)
                 });
 
-                expect(await (await s.data.imap).get(l)).to.deep.equal(v);
+                expect(await s.data.imap.get(l)).to.deep.equal(v);
             }
         ));
     });

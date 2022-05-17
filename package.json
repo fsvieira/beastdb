@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "asyncake": "^1.0.0",
     "level": "^8.0.0",
     "sha2": "^1.0.2",
     "short-uuid": "^4.2.0"
