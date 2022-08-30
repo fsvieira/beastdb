@@ -1,15 +1,12 @@
 const { expect } = require('chai');
-const { statistics } = require('fast-check');
-const {DB, ISet, IMap} = require('../lib/db');
+const {DB} = require('../lib/db');
 
 describe('Tic-tac-toe cases', () => {
-    // string text always contains itself
-
     let db;
     const dbName = 'dbs/basics.db';
     const storage = {
         storage: {
-          path: dbName
+            path: dbName
         }
     };
 
@@ -26,11 +23,10 @@ describe('Tic-tac-toe cases', () => {
             state: 'expand',
             turn: '',
             childs: await db.iSet(),
-            game: await db.iMap().fromJSON([
-                ['#', '#', '#'],
-                ['#', '#', '#'],
-                ['#', '#', '#']
-            ])
+            game: await db.iMap().chain
+                .set(0, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+                .set(1, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+                .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
         });
     });
     
@@ -56,22 +52,20 @@ describe('Tic-tac-toe cases', () => {
                 moves: 3,
                 turn: 'X',
                 state: 'expand',
-                game: await db.iMap().fromJSON([
-                    ['X', '#', '#'],
-                    ['#', 'O', '#'],
-                    ['#', '#', 'X']
-                ])
+                game: await db.iMap().chain
+                    .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, '#'))
+                    .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, '#'))
+                    .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
             });
 
             const r2 = await t.insert({
                 moves: 3,
                 turn: 'X',
                 state: 'expand',
-                game: await db.iMap().fromJSON([
-                    ['X', '#', '#'],
-                    ['#', 'O', '#'],
-                    ['#', '#', 'X']
-                ])
+                game: await db.iMap().chain
+                    .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, '#'))
+                    .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, '#'))
+                    .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
             }, null); // null is the same has insert ignore.
 
             expect(await r1.data.state).to.deep.equal('expand');
@@ -83,10 +77,10 @@ describe('Tic-tac-toe cases', () => {
                     moves: 3,
                     turn: 'X',
                     state: 'expand',
-                    game: await db.iMap().fromJSON([
-                        ['X', '#', '#'],
-                        ['#', 'O', '#'],
-                        ['#', '#', 'X']
+                    game: await db.iMap().chain
+                        .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, '#'))
+                        .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, '#'))
+                        .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
                     ])
                 })
             ).to.be.rejectedWith("Duplicated record 0j42vSMlXJaNSltCe5QRnW/tfwEmkZYRZuIuvFsF4Os= on table tictactoe!")
@@ -96,11 +90,10 @@ describe('Tic-tac-toe cases', () => {
                 moves: 3,
                 turn: 'X',
                 state: 'expand',
-                game: await db.iMap().fromJSON([
-                    ['X', '#', '#'],
-                    ['#', 'O', '#'],
-                    ['#', '#', 'X']
-                ])
+                game: await db.iMap().chain
+                    .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, '#'))
+                    .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, '#'))
+                    .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
             }, {state: 'end'}));
 
             expect(await r1.data.state).to.deep.equal('end');
@@ -178,11 +171,10 @@ describe('Tic-tac-toe cases', () => {
                 moves: 3,
                 turn: 'X',
                 state: 'expand',
-                game: await db.iMap().fromJSON([
-                    ['X', '#', '#'],
-                    ['#', 'O', '#'],
-                    ['#', '#', 'X']
-                ])
+                game: await db.iMap().chain
+                    .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, '#'))
+                    .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, '#'))
+                    .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
             });
 
             start.update({childs: await start.data.childs.add(s)});

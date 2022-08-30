@@ -61,7 +61,7 @@ After creating key and index we must call save to storage changes.
 ```
 
 ### Indexes
- Indexes can have one or more fields, and rigth now you can't make queries without them, ex.
+ Indexes can have one or more fields, currently you can't make queries without them, ex.
  
 ```javascript
   t.index('state')
@@ -84,14 +84,12 @@ There is no restriction to add fields on insert or update.
         state: 'expand',
         turn: '',
         childs: [],
-        game: await db.iMap().fromJSON([
-            ['#', '#', '#'],
-            ['#', '#', '#'],
-            ['#', '#', '#']
-        ])
+        game: await db.iMap().chain
+            .set(0, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+            .set(1, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+            .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
     }, null);
 ```
-
 
    * null : ignore if alredy exists,
    * object: on conflict update with object data, ex:
@@ -101,12 +99,11 @@ There is no restriction to add fields on insert or update.
         state: 'expand',
         turn: '',
         childs: [],
-        game: await db.iMap().fromJSON([
-            ['#', '#', '#'],
-            ['#', '#', '#'],
-            ['#', '#', '#']
-        ])
-    }, {state: 'existing');
+        game: await db.iMap().chain
+            .set(0, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+            .set(1, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+            .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+    }, {state: 'existing'});
 ```
    * async function (oldData, newData) {t.update(...)} : a function to solve the conflict  
  
@@ -196,10 +193,100 @@ and discard all intermidiate states.
        mymap: s1    
     });
 ```
+## chain
+    The IMap chain fields allows to chain async methods like this:
 
-## set
-## remove
-## iterators
+```javascript
+    await db.iMap().chain
+        .set(0, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+        .set(1, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+        .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+```    
+
+    Withoud the chain field the sets would have to be used sequentialy, like this.
+
+```javascript
+    let a = await db.iMap().set(0, 'example 0');
+    a = await a.set(1, 'example 1');
+    a = await a.set(2, 'example 2');
+```    
+
+
+## async set(key, value)
+    It sets a key value pair to the iMap
+
+```javascript
+    let a = await db.iMap().set(0, 'example 0');
+    a = await a.set(1, 'example 1');
+    a = await a.set(2, 'example 2');
+```    
+
+## async get(key)
+
+    get(key) return the value of the given key
+
+## async has(key)
+
+    has(key) checks if IMap has the given key.
+
+## async remove(key)
+    It removes a key from a IMap
+
+```javascript
+    let a = await db.iMap().set(0, 'example 0');
+    a = await a.set(1, 'example 1');
+    a = await a.set(2, 'example 2');
+
+    a.remove(1);
+```    
+
+
+## async iterators
+
+    It creates a iterator to iteratate [key, value] from IMap.
+
+```javascript
+    const r = [];
+    for await (let [key, value] of myIMap) {
+        r.push([key, value]);
+    }
+
+    return r;
+```    
+    
+### async *values()
+    creates a new iterator to iterate all map values.
+
+```javascript
+    const r = [];
+    for await (let value of myIMap.values()) {
+        r.push(value);
+    }
+
+    return r;
+```    
+
+### async *keys()
+    creates a new iterator to iterate all map keys.
+
+```javascript
+    const r = [];
+    for await (let key of myIMap.keys()) {
+        r.push(key);
+    }
+
+    return r;
+```    
+
+### async keysToArray()
+
+    It returns an array with all map keys.
+
+### async toArray()
+
+    It returns a json representation of IMap, the format is the same as norml JS Map.
+
+    example: [['keyA', 'valueA'], ['keyB', 'valueB'], ['keyC', 'valueC']]
 
 # ISet
 

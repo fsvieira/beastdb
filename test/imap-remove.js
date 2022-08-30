@@ -45,10 +45,10 @@ describe('remove elements from imap', () => {
             fc.jsonValue(), fc.jsonValue(),
             async (v1, v2) => {
                 const s = await db.tables.imaps.insert({
-                    imap: await db.iMap().multiSet({
-                        label: v1,
-                        label2: v2
-                    })
+                    imap: await db.iMap()
+                        .chain
+                        .set("label", v1)
+                        .set("label2", v2)
                 });
 
                 expect(await s.data.imap.size).to.be.equal(2);
@@ -85,10 +85,7 @@ describe('remove elements from imap', () => {
             async (l1, v1, v2) => {
                 const l2 = l1 + '_2';
                 const s = await db.tables.imaps.insert({
-                    imap: await db.iMap().multiSet({
-                        [l1]: v1,
-                        [l2]: v2
-                    })
+                    imap: await db.iMap().chain.set(l1, v1).set(l2, v2)
                 });
 
                 expect((await s.data.imap).size).to.be.equal(2);

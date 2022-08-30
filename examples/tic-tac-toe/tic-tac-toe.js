@@ -103,7 +103,7 @@ async function calcStatsTurn (t, turn) {
         await state.update({stats: {X: 0, T: 0, O: 0, [turn]: 1}, state: 'done'});
 
         const stack = [...(await state.data.parents)];
-        do {
+        do {            
             const parent = stack.pop();
             const stats = (await parent.data.stats) || {X:0, T:0, O: 0};
 
@@ -149,11 +149,10 @@ async function tictactoe () {
         state: 'expand',
         turn: '',
         childs: [],
-        game: await db.iMap().fromJSON([
-            ['#', '#', '#'],
-            ['#', '#', '#'],
-            ['#', '#', '#']
-        ])
+        game: await db.iMap().chain
+            .set(0, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+            .set(1, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
+            .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, '#'))
     }, null);
 
     let doExpand;
@@ -174,14 +173,15 @@ async function tictactoe () {
         }
     } while(doExpand)
 
-    await calcStats(t);
+    // TODO: calcStats seems to have a problem :/
+    // await calcStats(t);
 
     // find game state
-    const gameState = await db.iMap().fromJSON([
-        ['X', '#', 'O'],
-        ['#', 'O', 'O'],
-        ['X', '#', 'X']
-    ]);
+    const gameState = await db.iMap().chain
+        .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, 'O'))
+        .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, 'O'))
+        .set(2, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, 'X'))
+    ;
 
     for await (let state of t.findByIndex({game: gameState})) {
         const childs = await state.data.childs;
