@@ -219,7 +219,10 @@ and discard all intermidiate states.
     let a = await db.iMap().set(0, 'example 0');
     a = await a.set(1, 'example 1');
     a = await a.set(2, 'example 2');
-```    
+```
+Notes:
+  * All keys on IMap are strings, all non string keys will be converted to string
+  * Values can be any type described on the #Types sections.
 
 ## async get(key)
 
@@ -290,16 +293,86 @@ and discard all intermidiate states.
 
 # ISet
 
-## add
-## remove
-## iterators
+Since ISet is created on every write operation we can start with an empty iset and then 
+add new values like this:
+
+```javascript
+    const empty = await db.iSet();
+    let s1 = await empty.add(value1);
+    s1 = await s1.add(value2);    
+```
+
+After completing our imap we can save it to a record, this will only save the last ISet 
+and discard all intermidiate states.
+
+```javascript
+    await record.insert({
+       myset: s1
+    });
+```
+
+## chain
+    The ISet chain fields allows to chain async methods like this:
+
+```javascript
+    await db.iSet().chain.add(1).add(2).add(3)
+```    
+
+    Withoud the chain field the adds would have to be used sequentialy, like this.
+
+```javascript
+    let a = await db.iSet().add(1);
+    a = await a.add(2);
+    a = await a.add(3);
+```    
+
+## async add(value)
+  Adds a value to ISet
+  
+  Notes:
+    * Values can be any type described on the #Types sections.
+
+## async remove(value)
+  Removes a value from the ISet.
+  
+## async iterators
+
+    It creates a iterator to iteratate [key, value] from ISet.
+
+```javascript
+    const r = [];
+    for await (let [key, value] of myISet) {
+        r.push([key, value]);
+    }
+
+    return r;
+```    
+
+In this case the keys would be 0, 1, ...
+
+### async *values()
+    creates a new iterator to iterate all ISet values.
+
+```javascript
+    const r = [];
+    for await (let value of myISet.values()) {
+        r.push(value);
+    }
+
+    return r;
+```    
+
+### async toArray()
+
+  It returns an array with all ISet values,
+  
+  example: [1, 2, 3, 4]
+
 
 
 # Example
 
-TODO
-
-## 
+  * Tic-Tac-Toe: https://github.com/fsvieira/beastdb/tree/main/examples/tic-tac-toe
 
 # The Name
 The name beast derives from brute-force and was chosen as a synonym of brute.
