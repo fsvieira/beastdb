@@ -70,6 +70,33 @@ After creating key and index we must call save to storage changes.
 
 This allows us to query 'state' alone and 'win' and 'state' togheter.
 
+### findByIndex(searchObject)
+
+It finds a record using a index or key, the index must be declared,
+if the search uses more then one field then there must exist an index with all the search fields, 
+
+ex. 
+   t.index('win', 'state'); db.tables.games.findByIndex({win: 'O', state: 'done');
+   
+You can make indexes and search for any field type, for example IMap:
+
+```javascript
+const gameState = await db.iMap().chain
+        .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, 'O'))
+        .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, 'O'))
+        .set(2, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, 'X'))
+;
+    
+for await (let state of t.findByIndex({game: gameState})) {
+        const childs = await state.data.childs;
+
+        for (let child of childs) {
+            print(child);
+        }
+}
+```
+
+
 ## Records
 
 To create and update records we use insert and update operations.
