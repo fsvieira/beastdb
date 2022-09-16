@@ -19,6 +19,21 @@ This is the main diference bettwen BeastDB and other databases, but its not the 
  * Types
  * Query
 
+# Install
+
+```
+    npm install beastdb --save
+```
+
+## Use
+
+Just require the beastdb module.
+
+```
+    const {DB} = require("beastdb");
+```
+
+
 ## Create Database
 
 To create a database just pass the storage option with a path.

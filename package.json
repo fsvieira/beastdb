@@ -1,7 +1,7 @@
 {
   "name": "beastdb",
   "version": "1.0.0",
-  "description": "",
+  "description": "A persistence database specializing in state space search problems!",
   "main": "lib/db.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
