@@ -21,7 +21,7 @@ async function beastDump(db, tableName, query) {
         const record = records[i];
         const js = await record.toJS();
 
-        // console.log(js);
+        console.log(js);
         console.log(JSON.stringify(js, null, '  '));
     }
 
