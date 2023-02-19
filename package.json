@@ -1,6 +1,6 @@
 {
   "name": "beastdb",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A persistence database specializing in state space search problems!",
   "main": "lib/db.js",
   "scripts": {
