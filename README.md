@@ -344,7 +344,7 @@ add new values like this:
     s1 = await s1.add(value2);    
 ```
 
-After completing our imap we can save it to a record, this will only save the last ISet 
+After completing our iset we can save it to a record, this will only save the last ISet 
 and discard all intermidiate states.
 
 ```javascript
@@ -407,6 +407,81 @@ In this case the keys would be 0, 1, ...
 ### async toArray()
 
   It returns an array with all ISet values,
+  
+  example: [1, 2, 3, 4]
+
+# IArray
+
+Since IArray is created on every write operation we can start with an empty iarray and then 
+add new values like this:
+
+```javascript
+    const empty = await db.iArray();
+    let s1 = await empty.push(value1);
+    s1 = await s1.push(value2);    
+```
+
+After completing our iarray we can save it to a record, this will only save the last IArray 
+and discard all intermidiate states.
+
+```javascript
+    await record.insert({
+       myarray: s1
+    });
+```
+
+## chain
+    The IArray chain fields allows to chain async methods like this:
+
+```javascript
+    await db.iArray().chain.push(1).push(2).push(3)
+```    
+
+    Withoud the chain field the adds would have to be used sequentialy, like this.
+
+```javascript
+    let a = await db.iArray().push(1);
+    a = await a.push(2);
+    a = await a.push(3);
+```    
+
+## async push(value)
+
+ Pushes a value to the last position of the iarray and returns a new iarray.
+
+```javascript
+    let a = await db.iArray().push(1);
+    a = await a.push(2);
+    a = await a.push(3);
+```    
+
+## async pop()
+ Pops the last value of array, it returns the new iarray and value. 
+
+```javascript
+    let [newIArray, popedValue] = await db.iArray().chain.push(1).pop();
+```    
+
+## async setIndex(index, value)
+
+## length
+ The size of the array
+
+```javascript
+  const size = iarray.length;
+```    
+
+## setIndex(index, value)
+
+  Sets the index value to value, index must be inside of interval [0, this.size]
+  
+```javascript
+  let newIarray = await iarray.chain.push(1).push(2).push(3).setIndex(1, 2);
+```    
+  
+
+## async toArray() 
+  It returns an array with all IArray values in inserted order,
   
   example: [1, 2, 3, 4]
 
