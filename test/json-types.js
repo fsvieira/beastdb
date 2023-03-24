@@ -1,19 +1,21 @@
 const { expect } = require('chai');
 const fc = require('fast-check');
 const {DB} = require('../lib/db');
+const LevelDBStorage = require('../storage/levelDBStorage');
 
 describe('check database types', () => {
     // string text always contains itself
     let db;
-    const dbName = 'dbs/basics.db';
+    // const dbName = 'dbs/basics.db';
+    /*
     const storage = {
         storage: {
           path: dbName
         }
-    };
+    };*/
 
     beforeEach(async function () {
-        db = await DB.open(storage);
+        db = await DB.open(new LevelDBStorage({dbsPath: 'dbs', dbname: 'basics.db'}));
     });
     
     afterEach(async function () {
