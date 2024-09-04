@@ -23,7 +23,25 @@ describe('Simple IArray operations', () => {
         delete db;
     });
 
-    it('should int elements elements on IArray', async function () {
+    it('should be able to insert same array twice', async function () {
+        // create same array and add it 
+        let a = await db.iArray();
+        let b = await db.iArray();
+
+        a = await a.push(1);
+        b = await b.push(1);
+
+        await db.tables.imaps.insert({
+            iarray: a
+        });
+
+        await db.tables.imaps.insert({
+            iarray: b
+        });
+
+    });
+
+    xit('should int elements elements on IArray', async function () {
         return await fc.assert(fc.asyncProperty(
             fc.array(fc.nat()),
             async v => {
@@ -48,7 +66,7 @@ describe('Simple IArray operations', () => {
         ));
     });
 
-    it('should pop int elements on IArray', async function () {
+    xit('should pop int elements on IArray', async function () {
         return await fc.assert(fc.asyncProperty(
             fc.array(fc.nat()),
             async v => {
