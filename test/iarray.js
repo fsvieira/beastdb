@@ -41,7 +41,7 @@ describe('Simple IArray operations', () => {
 
     });
 
-    xit('should int elements elements on IArray', async function () {
+    it('should int elements elements on IArray', async function () {
         return await fc.assert(fc.asyncProperty(
             fc.array(fc.nat()),
             async v => {
@@ -66,7 +66,7 @@ describe('Simple IArray operations', () => {
         ));
     });
 
-    xit('should pop int elements on IArray', async function () {
+    it('should pop int elements on IArray', async function () {
         return await fc.assert(fc.asyncProperty(
             fc.array(fc.nat()),
             async v => {
