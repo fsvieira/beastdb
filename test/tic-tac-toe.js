@@ -177,7 +177,7 @@ describe('Tic-tac-toe cases', () => {
                     .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
             });
 
-            start.update({childs: await start.data.childs.add(s)});
+            await start.update({childs: await start.data.childs.add(s)});
 
             const childs = (await start.data.childs.toArray()).map(node => node.id);
             
