@@ -39,9 +39,11 @@ describe('Simple Conflict tests', () => {
         const dataB = await record.snapshot();
 
         dataA.data.myset = await dataA.data.myset.add(1);
-        dataB.data.myset = await dataB.data.myset.add(2);
 
         await dataA.update();
+
+        dataB.data.myset = await dataB.data.myset.add(2);
+
         // await record.update(dataA);
 
         try {
