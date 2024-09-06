@@ -1,7 +1,10 @@
 const { expect } = require('chai');
-const { DB } = require('../lib/db');
-
-const Record = require('../lib/record');
+const { 
+    DB, 
+    Exceptions: {
+        RecordUpdateConflictException
+    }
+} = require('../lib/db');
 
 describe('Simple Conflict tests', () => {
     // string text always contains itself
@@ -32,45 +35,32 @@ describe('Simple Conflict tests', () => {
             myset
         });
 
-        const dataA = {
-            myset: await record.data.myset,
-            __version: await record.data.__version,
-            __hashHistory: await record.data.__hashHistory
-        };
+        const dataA = await record.snapshot();
+        const dataB = await record.snapshot();
 
-        const dataB = {
-            myset: await record.data.myset,
-            __version: await record.data.__version,
-            __hashHistory: await record.data.__hashHistory
-        };
+        dataA.data.myset = await dataA.data.myset.add(1);
+        dataB.data.myset = await dataB.data.myset.add(2);
 
-        dataA.myset = await dataA.myset.add(1);
-        dataB.myset = await dataB.myset.add(2);
-
-        await record.update(dataA);
+        await dataA.update();
+        // await record.update(dataA);
 
         try {
-            await record.update(dataB);
+            await dataB.update();
         }
         catch (e) {
-            if (e instanceof Record.Exception.UpdateConflict) {
-                const mergedData = {
-                    __version: await record.data.__version,
-                    __hashHistory: await record.data.__hashHistory,
-                    myset: await record.data.myset
-                };
+            if (e instanceof RecordUpdateConflictException) {
+                const mergedData = await record.snapshot();
                 
-                for await (let e of await dataB.myset.values()) {
-                    mergedData.myset = await mergedData.myset.add(e);
+                for await (let e of await dataB.data.myset.values()) {
+                    mergedData.data.myset = await mergedData.data.myset.add(e);
                 }
 
-                await record.update(mergedData);
-
-                const result = await record.data.myset.toArray();
-
-                expect(result).to.be.eql([1, 2]);
+                await mergedData.update();
             }
         }
+
+        const result = await record.data.myset.toArray();
+        expect(result).to.be.eql([1, 2]);
 
     });
 });
