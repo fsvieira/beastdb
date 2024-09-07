@@ -1,3 +1,5 @@
+"use strict";
+
 const { expect } = require('chai');
 const { 
     DB, 
@@ -24,7 +26,7 @@ describe('Simple Conflict tests', () => {
     afterEach(async function () {
         await db.clear();
         await db.close();
-        delete db;
+        db = null;
     });
 
     it('should be able to handle conflicts', async function () {
@@ -32,17 +34,25 @@ describe('Simple Conflict tests', () => {
         let myset = db.iSet();
 
         const record = await db.tables.mySets.insert({
-            myset
+            myset,
+            test: [{deep: {freeze: true }}, {deep: {freeze: true }}]
         });
 
         const dataA = await record.snapshot();
         const dataB = await record.snapshot();
 
-        dataA.data.myset = await dataA.data.myset.add(1);
+
+        expect(() => dataA.changes.test[1].deep.freeze = false).to.throw(
+            "Cannot assign to read only property 'freeze' of object '#<Object>'"
+        );
+        
+        expect(dataA.changes.test[1].deep.freeze).to.be.eql(true);
+
+        dataA.changes.myset = await dataA.changes.myset.add(1);
 
         await dataA.update();
 
-        dataB.data.myset = await dataB.data.myset.add(2);
+        dataB.changes.myset = await dataB.changes.myset.add(2);
 
         // await record.update(dataA);
 
@@ -53,8 +63,8 @@ describe('Simple Conflict tests', () => {
             if (e instanceof RecordUpdateConflictException) {
                 const mergedData = await record.snapshot();
                 
-                for await (let e of await dataB.data.myset.values()) {
-                    mergedData.data.myset = await mergedData.data.myset.add(e);
+                for await (let e of await dataB.changes.myset.values()) {
+                    mergedData.changes.myset = await mergedData.changes.myset.add(e);
                 }
 
                 await mergedData.update();
