@@ -33,7 +33,10 @@ describe('remove elements from imap', () => {
 
                 expect(await s.data.imap.size).to.be.equal(1);
 
-                await s.update({ imap: await s.data.imap.remove('label') });
+                const changes = await s.snapshot();
+                changes.data.imap = await changes.data.imap.remove('label');
+                await changes.update();
+
                 expect(await s.data.imap.get('label')).to.be.undefined;
                 expect(await s.data.imap.size).to.be.equal(0);
             }
@@ -53,7 +56,11 @@ describe('remove elements from imap', () => {
 
                 expect(await s.data.imap.size).to.be.equal(2);
 
-                await s.update({ imap: await s.data.imap.remove('label') });
+                const changes = await s.snapshot();
+                changes.data.imap = await changes.data.imap.remove('label');
+
+                await changes.update();
+
                 expect(await s.data.imap.get('label')).to.be.undefined;
                 expect(await s.data.imap.get('label2')).to.deep.equal(v2);
 
@@ -72,7 +79,11 @@ describe('remove elements from imap', () => {
 
                 expect((await s.data.imap).size).to.be.equal(1);
 
-                await s.update({ imap: await s.data.imap.remove(l) });
+                const changes = await s.snapshot();
+                changes.data.imap = await changes.data.imap.remove(l);
+
+                await changes.update();
+                
                 expect(await s.data.imap.get(l)).to.be.undefined;
                 expect(await s.data.imap.size).to.be.equal(0);
             }
@@ -90,7 +101,11 @@ describe('remove elements from imap', () => {
 
                 expect((await s.data.imap).size).to.be.equal(2);
 
-                await s.update({ imap: await s.data.imap.remove(l1) });
+                const changes = await s.snapshot();
+                changes.data.imap = await changes.data.imap.remove(l1);
+
+                await changes.update();
+
                 expect(await s.data.imap.get(l1)).to.be.undefined;
                 expect(await s.data.imap.get(l2)).to.deep.equal(v2);
                 expect(await s.data.imap.size).to.be.equal(1);

@@ -72,20 +72,6 @@ describe('Tic-tac-toe cases', () => {
 
             expect(r1.id).to.deep.equal(r2.id);
 
-            /* Only works with chai-promise ?
-            expect(await t.insert({
-                    moves: 3,
-                    turn: 'X',
-                    state: 'expand',
-                    game: await db.iMap().chain
-                        .set(0, await db.iMap().chain.set(0, 'X').set(1, '#').set(2, '#'))
-                        .set(1, await db.iMap().chain.set(0, '#').set(1, 'O').set(2, '#'))
-                        .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
-                    ])
-                })
-            ).to.be.rejectedWith("Duplicated record 0j42vSMlXJaNSltCe5QRnW/tfwEmkZYRZuIuvFsF4Os= on table tictactoe!")
-            */ 
-
             expect(await t.insert({
                 moves: 3,
                 turn: 'X',
@@ -177,7 +163,9 @@ describe('Tic-tac-toe cases', () => {
                     .set(2, await db.iMap().chain.set(0, '#').set(1, '#').set(2, 'X'))
             });
 
-            await start.update({childs: await start.data.childs.add(s)});
+            const changes = await start.snapshot();
+            changes.data.childs = await changes.data.childs.add(s);
+            await changes.update();
 
             const childs = (await start.data.childs.toArray()).map(node => node.id);
             

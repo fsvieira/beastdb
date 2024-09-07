@@ -1,4 +1,4 @@
-const {DB, ISet, IMap} = require('../../lib/db');
+const { DB } = require('../../lib/db');
 
 async function isWin(turn, game) {
     // check lines: 
@@ -100,17 +100,29 @@ async function calcStatsTurn (t, turn) {
     console.log(`-- Gen ${turn} Stats`);
 
     for await (let state of t.findByIndex({win: turn, state: 'stats'})) {
-        await state.update({stats: {X: 0, T: 0, O: 0, [turn]: 1}, state: 'done'});
+        const changes = await state.snapshot();
+        changes.data.stats = {X: 0, T: 0, O: 0, [turn]: 1};
+        changes.data.state = 'done';
+        await changes.update();
+
+        // await state.update({stats: {X: 0, T: 0, O: 0, [turn]: 1}, state: 'done'});
 
         const stack = [...(await state.data.parents)];
         do {            
             const parent = stack.pop();
+            const changes = await parent.snapshot();
+            const stats = changes.data.stats || {X:0, T:0, O: 0};
+            changes.data.stats = {...stats, [turn]: (stats[turn] || 0) + 1};
+            changes.state = 'done';
+
+            await changes.update();
+            /*
             const stats = (await parent.data.stats) || {X:0, T:0, O: 0};
 
             await parent.update({
                 stats: {...stats, [turn]: (stats[turn] || 0) + 1},
                 state: 'done'
-            });
+            });*/
 
             const parents = await parent.data.parents;
             if (parents) {
