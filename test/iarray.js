@@ -14,7 +14,9 @@ describe('Simple IArray operations', () => {
     };
 
     beforeEach(async function () {
-        db = await DB.open(storage)
+        // db = await DB.open(storage)
+        db = new DB(storage);
+        await db.start();
     });
 
     afterEach(async function () {

@@ -11,7 +11,10 @@ describe('Tic-tac-toe cases', () => {
     };
 
     beforeEach(async function () {
-        db = await DB.open(storage)
+        // db = await DB.open(storage)
+        db = new DB(storage);
+        await db.start();
+
         const t = await db.tables.tictactoe
             .key('stateID', ['game', 'turn', 'moves'])
             .index('state')
