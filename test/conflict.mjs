@@ -1,12 +1,11 @@
 "use strict";
 
-const { expect } = require('chai');
-const { 
-    DB, 
-    Exceptions: {
-        RecordUpdateConflictException
-    }
-} = require('../lib/db');
+// const { expect } = require('chai');
+import { expect } from 'chai';
+import { 
+    BeastDB,
+    Exceptions
+} from '../lib/beastDB.mjs';
 
 describe('Simple Conflict tests', () => {
     // string text always contains itself
@@ -21,7 +20,7 @@ describe('Simple Conflict tests', () => {
 
     beforeEach(async function () {
         // db = await DB.open(storage)
-        db = new DB(storage);
+        db = new BeastDB(storage);
         await db.start();
     });
 
@@ -62,7 +61,7 @@ describe('Simple Conflict tests', () => {
             await dataB.update();
         }
         catch (e) {
-            if (e instanceof RecordUpdateConflictException) {
+            if (e instanceof Exceptions.RecordUpdateConflictException) {
                 const mergedData = await record.snapshot();
                 
                 for await (let e of await dataB.data.myset.values()) {

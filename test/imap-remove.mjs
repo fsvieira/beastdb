@@ -1,6 +1,6 @@
-const { expect } = require('chai');
-const fc = require('fast-check');
-const { DB, IMap } = require('../lib/db');
+import { expect } from 'chai';
+import fc from 'fast-check';
+import { BeastDB } from '../lib/beastDB.mjs';
 
 describe('remove elements from imap', () => {
     // string text always contains itself
@@ -15,7 +15,7 @@ describe('remove elements from imap', () => {
 
     beforeEach(async function () {
         // db = await DB.open(storage)
-        db = new DB(storage);
+        db = new BeastDB(storage);
         await db.start();
 
     });
@@ -23,7 +23,8 @@ describe('remove elements from imap', () => {
     afterEach(async function () {
         await db.clear();
         await db.close();
-        delete db;
+
+        db = null;
     });
 
     it('should remove imap one key from size=1 imap', async function () {

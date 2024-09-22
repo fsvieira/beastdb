@@ -1,5 +1,5 @@
-const { expect } = require('chai');
-const {DB} = require('../lib/db');
+import { expect } from 'chai';
+import {BeastDB} from '../lib/beastDB.mjs';
 
 describe('Tic-tac-toe cases', () => {
     let db;
@@ -12,7 +12,7 @@ describe('Tic-tac-toe cases', () => {
 
     beforeEach(async function () {
         // db = await DB.open(storage)
-        db = new DB(storage);
+        db = new BeastDB(storage);
         await db.start();
 
         const t = await db.tables.tictactoe
@@ -36,7 +36,7 @@ describe('Tic-tac-toe cases', () => {
     afterEach(async function () {
         await db.clear();
         await db.close();
-        delete db;
+        db = null;
     });
 
     describe('Test Game States', () => {
@@ -172,7 +172,7 @@ describe('Tic-tac-toe cases', () => {
 
             const childs = (await start.data.childs.toArray()).map(node => node.id);
             
-            expect(childs).to.deep.equal(["JQ/LEUYoLMVLnJXGhhppRcB4wXc+zLLAGucy8rXeZe4="]);
+            expect(childs).to.deep.equal(["2YJZbet4tbY83cM5O6E8CbKzuJ1dGo2ZkaMaAmxqf5M"]);
         });
     });
 });

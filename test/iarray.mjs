@@ -1,6 +1,6 @@
-const { expect } = require('chai');
-const fc = require('fast-check');
-const { DB, IMap } = require('../lib/db');
+import { expect } from 'chai';
+import fc from 'fast-check';
+import { BeastDB, IMap } from '../lib/beastDB.mjs';
 
 describe('Simple IArray operations', () => {
     // string text always contains itself
@@ -15,14 +15,14 @@ describe('Simple IArray operations', () => {
 
     beforeEach(async function () {
         // db = await DB.open(storage)
-        db = new DB(storage);
+        db = new BeastDB(storage);
         await db.start();
     });
 
     afterEach(async function () {
         await db.clear();
         await db.close();
-        delete db;
+        db = null;
     });
 
     it('should be able to insert same array twice', async function () {

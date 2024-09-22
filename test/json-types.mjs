@@ -1,6 +1,6 @@
-const { expect } = require('chai');
-const fc = require('fast-check');
-const {DB} = require('../lib/db');
+import { expect } from 'chai';
+import fc from 'fast-check';
+import {BeastDB} from '../lib/beastDB.mjs';
 
 describe('check database types', () => {
     // string text always contains itself
@@ -14,7 +14,7 @@ describe('check database types', () => {
 
     beforeEach(async function () {
         // db = await DB.open(storage);
-        db = new DB(storage);
+        db = new BeastDB(storage);
         await db.start();
 
     });
@@ -22,7 +22,7 @@ describe('check database types', () => {
     afterEach(async function () {
         await db.clear();
         await db.close();
-        delete db;
+        db = null;
     });
 
     it('should preserve json types', async () => {
