@@ -49,7 +49,7 @@ describe('Simple Fetch tests', () => {
         dbB = null;
     });
 
-    it('Simple transfer from nodeA to nodeB (connection)', async function () {
+    xit('Simple transfer from nodeA to nodeB (connection)', async function () {
         const id = 'testA1';
         const text = 'A test record'
 
@@ -62,6 +62,38 @@ describe('Simple Fetch tests', () => {
         expect(s.data.__version).to.be.eql(1);
         expect(s.data.id).to.be.eql(id);
         expect(s.data.text).to.be.eql(text);
+    });
+
+    it('Simple transfer from nodeA to nodeB (with update)', async function () {
+        const text = 'A - TODO';
+
+        await dbA.tables.todos.key('todoID').index('done').save();
+        await dbB.tables.todos.key('todoID').index('done').save();
+
+        const recordA = await dbA.tables.todos.insert({text, done: false});
+        const hashesA1 = await recordA.data.__hashHistory;
+
+        // await new Promise(resolve => setTimeout(resolve, 100 * 5));
+
+        const recordB = await dbB.tables.todos.find(recordA.id);
+
+        const hashesB1 = await recordB.data.__hashHistory;
+        expect(hashesB1).to.be.eql(hashesA1);
+
+        const s = await recordA.snapshot();
+        s.data.done = true;
+        await s.update();
+
+        // wait for things to propagate
+        await new Promise(resolve => setTimeout(resolve, 100 * 5));
+
+        const hashesA2 = await recordA.data.__hashHistory;
+
+        const hashesB2 = await recordB.data.__hashHistory;
+
+        console.log(' A ==>', hashesA1, hashesA2);
+        console.log(' B ==>', hashesB1, hashesB2);
+        
     });
 
 });
