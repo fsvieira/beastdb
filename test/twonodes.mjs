@@ -49,7 +49,7 @@ describe('Simple Fetch tests', () => {
         dbB = null;
     });
 
-    xit('Simple transfer from nodeA to nodeB (connection)', async function () {
+    it('Simple transfer from nodeA to nodeB (connection)', async function () {
         const id = 'testA1';
         const text = 'A test record'
 

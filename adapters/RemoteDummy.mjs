@@ -19,6 +19,37 @@ export default class RemoteDummy extends Remote {
         }
     }
 
+    async broadcast (cmd, payload, maxAnwsers) {
+        let replies = [];
+        for (let node of this.nodes) {
+           await node.router(
+                cmd, 
+                payload, 
+                msg => {
+                    if (msg) {
+                        replies = replies.concat(msg);
+                    }
+                }
+           );
+        }
+
+        return replies;
+    }
+
+    /*
+    async pullNode (inode) {
+        for (let node of this.nodes) {
+            const data = await node.db.serializeNode(
+                inode.constructor.name, 
+                inode.id
+            );
+
+            if (data) {
+                return this.db.saveNode(data);
+            }
+        }
+    }
+
     async pushRecordChanges (changes) {
         for (let node of this.nodes) {
             await node.db.applyRecordChanges(changes);
@@ -34,24 +65,11 @@ export default class RemoteDummy extends Remote {
             changes = changes.concat(cs);
         }
 
-        const record = await this.db.applyRecordChanges(changes);
+        const [record] = await this.db.applyRecordChanges(changes);
 
         return record;
     }
-    
-    async pullNode (inode) {
-        for (let node of this.nodes) {
-            const data = await node.db.serializeNode(
-                inode.constructor.name, 
-                inode.id
-            );
-
-            if (data) {
-                return this.db.saveNode(data);
-            }
-        }
-    }
-    
+        
     async pullRecordChangesByIndex (tableName, queryObj) {
         try {    
             let changes = [];
@@ -71,6 +89,6 @@ export default class RemoteDummy extends Remote {
             console.log(e);
             throw e;
         }    
-    }
+    }*/
 }
 
